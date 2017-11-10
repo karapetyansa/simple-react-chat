@@ -3,3 +3,5 @@
 - [Официальная документация React](https://reactjs.org/docs/hello-world.html)
 - [Полное руководство по ReactJS](https://learn-reactjs.ru/home)
 
+[create react app](https://github.com/facebookincubator/create-react-app)
+

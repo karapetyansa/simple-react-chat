@@ -1,0 +1,14 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "'Sergey <karapetyan.sa@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^3.3.1"
+  }
+}

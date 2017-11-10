@@ -11,7 +11,9 @@ const socket = new WebSocket(uri)
 socket.onmessage = function(event) {
   console.log('Получены данные ' + event.data)
 }
+
 setTimeout(1000, () => socket.send('Привет мир!'))
+
 React.createElement('App')
 ReactDOM.render(<App />, document.getElementById('root'))
 registerServiceWorker()

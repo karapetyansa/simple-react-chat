@@ -5,7 +5,7 @@ class InputForm extends Component {
     event.preventDefault()
     let input = event.target.elements.input
     this.props.addMessage(input.value)
-    console.log(input.value)
+    input.value = ''
   }
   render() {
     return (

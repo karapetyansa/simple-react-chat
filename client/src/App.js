@@ -5,37 +5,50 @@ import './App.css'
 import InputForm from './components/InputForm'
 import MessagesList from './components/MessagesList'
 
-const posts = [
-  {
-    key: 1,
-    authorName: 'Вася',
-    content: 'Всем привет'
-  },
-  {
-    key: 2,
-    authorName: 'Оля',
-    content: 'привет'
-  },
-  {
-    key: 3,
-    authorName: 'Алёша',
-    content: 'выфвафы'
-  }
-]
-
-// const Test = props => <div>{props.name}</div>
-
 class App extends Component {
-  state = { posts: posts, myName: 'Сергей' }
+  state = { posts: [], myName: undefined, socket: undefined }
+
   addMessage = message => {
+    console.log(message)
     this.state.posts.push({
-      key: posts.length + 1,
-      authorName: this.state.myName,
-      content: message
+      key: message.id,
+      authorName: message.authorName,
+      content: message.content
     })
     this.setState({
       posts: this.state.posts
     })
+  }
+
+  handleSubmit = message => {
+    this.state.socket.send(
+      JSON.stringify({
+        authorName: this.state.myName,
+        content: message
+      })
+    )
+  }
+
+  socket = undefined
+
+  handleSetName = name => {
+    this.setState({
+      myName: name
+    })
+    this.state.socket = new WebSocket(this.props.uri)
+    this.state.socket.onmessage = event => {
+      // console.log(event.data.type)
+      const message = JSON.parse(event.data)
+      if (message.type === 'message') {
+        console.log('message', message.type)
+        this.addMessage(message.message)
+      } else if (message.type === 'messages') {
+        this.setState({
+          posts: message.messages
+        })
+      }
+      console.log('Получены данные ' + event.data)
+    }
   }
 
   render() {
@@ -48,8 +61,14 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-        <InputForm addMessage={this.addMessage} />
-        <MessagesList posts={this.state.posts} />
+        {!this.state.myName ? (
+          <InputForm addMessage={this.handleSetName} />
+        ) : (
+          <div>
+            <InputForm addMessage={this.handleSubmit} />
+            <MessagesList posts={this.state.posts} />
+          </div>
+        )}
       </div>
     )
   }

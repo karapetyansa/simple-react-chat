@@ -10,7 +10,12 @@ class InputForm extends Component {
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <input type="text" id="input" />
+        <input
+          type="text"
+          id="input"
+          className="form-control"
+          placeholder={this.props.placeHolder}
+        />
       </form>
     )
   }

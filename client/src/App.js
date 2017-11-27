@@ -1,19 +1,16 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { animateScroll } from 'react-scroll'
 
 import InputForm from './components/InputForm'
 import MessagesList from './components/MessagesList'
 
 class App extends Component {
-  state = { posts: [], myName: undefined, socket: undefined }
+  state = { posts: [], myName: undefined }
 
-  addMessage = message => {
-    console.log(message)
+  addMessage = ({ id, ...rest }) => {
     this.state.posts.push({
-      key: message.id,
-      authorName: message.authorName,
-      content: message.content
+      key: id,
+      ...rest
     })
     this.setState({
       posts: this.state.posts
@@ -21,7 +18,7 @@ class App extends Component {
   }
 
   handleSubmit = message => {
-    this.state.socket.send(
+    this.socket.send(
       JSON.stringify({
         authorName: this.state.myName,
         content: message
@@ -35,13 +32,14 @@ class App extends Component {
     this.setState({
       myName: name
     })
-    this.state.socket = new WebSocket(this.props.uri)
-    this.state.socket.onmessage = event => {
+    this.socket = new WebSocket(this.props.uri)
+    this.socket.onmessage = event => {
       // console.log(event.data.type)
       const message = JSON.parse(event.data)
       if (message.type === 'message') {
         console.log('message', message.type)
         this.addMessage(message.message)
+        if (!document.hasFocus()) this.props.ring.play()
       } else if (message.type === 'messages') {
         this.setState({
           posts: message.messages
@@ -51,22 +49,33 @@ class App extends Component {
     }
   }
 
+  componentDidUpdate(nextProps, nextState) {
+    animateScroll.scrollToBottom()
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Добро пожаловать в чат</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
+      <div className="container" style={{ maxWidth: '400px' }}>
+        <h2 className="text-center">Websocket React Chat Example</h2>
+        <p className="lead">
+          Чат созданный в учебных целях с использованием технологий React,
+          Node.js, Bootstrap, Websocket
         </p>
         {!this.state.myName ? (
-          <InputForm addMessage={this.handleSetName} />
+          <InputForm
+            addMessage={this.handleSetName}
+            placeHolder="Введите свое имя"
+          />
         ) : (
           <div>
-            <InputForm addMessage={this.handleSubmit} />
-            <MessagesList posts={this.state.posts} />
+            <div className="sticky-top">
+              <h3 className="text-info">{this.state.myName}</h3>
+            </div>
+            <MessagesList posts={this.state.posts} myName={this.state.myName} />
+            <InputForm
+              addMessage={this.handleSubmit}
+              placeHolder="Введите сообщение"
+            />
           </div>
         )}
       </div>
